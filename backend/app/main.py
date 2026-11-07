@@ -13,6 +13,7 @@ from .schemas import ChatRequest, ChatResponse, HealthResponse, TestResponse
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
 
 app = FastAPI(title="Ramagiri Tarun Siddhartha GPT API", version="1.0.0")
+handler = app
 gemini = GeminiService(settings)
 
 app.add_middleware(

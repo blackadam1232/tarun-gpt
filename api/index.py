@@ -10,3 +10,5 @@ for p in [str(ROOT_DIR), str(BACKEND_DIR)]:
 
 from backend.app.main import app  # noqa: F401
 
+handler = app
+
