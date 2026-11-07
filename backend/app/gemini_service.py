@@ -3,6 +3,8 @@
 The API key lives only here, on the server. Errors from Gemini are translated into
 GeminiServiceError objects carrying an HTTP status and a message that is safe to show users.
 """
+from __future__ import annotations
+
 import logging
 import time
 from dataclasses import dataclass

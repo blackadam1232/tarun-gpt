@@ -1,5 +1,7 @@
 """Pydantic models that validate every request and response."""
-from typing import Literal
+from __future__ import annotations
+
+from typing import Literal, Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 

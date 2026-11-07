@@ -1,4 +1,6 @@
 """Application settings, loaded once from backend/.env (or real environment variables)."""
+from __future__ import annotations
+
 import os
 from dataclasses import dataclass
 from pathlib import Path
@@ -27,16 +29,21 @@ class Settings:
 
 def load_settings() -> Settings:
     origins = os.getenv("CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173")
-    # On Vercel, frontend and API share the same origin, so CORS is not needed.
-    # But we still support explicit origins for other deployments.
     vercel_url = os.getenv("VERCEL_URL")
     if vercel_url and f"https://{vercel_url}" not in origins:
         origins = f"{origins},https://{vercel_url}"
+    
+    timeout_raw = os.getenv("REQUEST_TIMEOUT_SECONDS", "60")
+    try:
+        timeout_s = int(timeout_raw) if timeout_raw else 60
+    except ValueError:
+        timeout_s = 60
+
     return Settings(
         gemini_api_key=_clean(os.getenv("GEMINI_API_KEY")),
-        gemini_model=_clean(os.getenv("GEMINI_MODEL")),
+        gemini_model=_clean(os.getenv("GEMINI_MODEL", "gemini-3.6-flash")),
         cors_origins=[o.strip() for o in origins.split(",") if o.strip()],
-        request_timeout_s=int(os.getenv("REQUEST_TIMEOUT_SECONDS", "60")),
+        request_timeout_s=timeout_s,
     )
 
 
