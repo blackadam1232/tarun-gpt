@@ -7,3 +7,4 @@ if str(DIR) not in sys.path:
     sys.path.insert(0, str(DIR))
 
 from app.main import app  # noqa: F401
+
