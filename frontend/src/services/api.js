@@ -11,7 +11,7 @@ export class ApiError extends Error {
 }
 
 const UNREACHABLE =
-  'Cannot reach the Ramagiri Tarun Siddhartha GPT backend. Make sure it is running: uvicorn app.main:app --port 8000'
+  'Cannot reach the backend. Make sure it is running: uvicorn app.main:app --port 8000'
 
 async function request(path, options = {}) {
   let response
