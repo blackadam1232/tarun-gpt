@@ -9,3 +9,4 @@ for p in [str(ROOT_DIR), str(BACKEND_DIR)]:
         sys.path.insert(0, p)
 
 from backend.app.main import app  # noqa: F401
+
