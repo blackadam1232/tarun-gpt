@@ -1,42 +1,23 @@
-import { useEffect, useRef } from 'react'
-import { Eraser, Menu, Sparkles, Zap } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import {
+  Check,
+  ChevronDown,
+  Eraser,
+  Menu,
+  RotateCcw,
+  Sparkles,
+} from 'lucide-react'
 import ChatInput from './ChatInput'
 import Logo from './Logo'
 import Message from './Message'
 import WelcomeScreen from './WelcomeScreen'
 
-const BADGE = {
-  connecting: { tone: 'warn', label: 'Connecting…', hint: 'Connecting to backend...' },
-  ready: { tone: 'ok', hint: 'Active Gemini Intelligence Model' },
-  'no-key': {
-    tone: 'warn',
-    label: 'API Key Missing',
-    hint: 'Configure GEMINI_API_KEY in backend/.env',
-  },
-  offline: {
-    tone: 'bad',
-    label: 'Backend Offline',
-    hint: 'Start the FastAPI backend on port 8000',
-  },
-}
-
-function ModelBadge({ backend }) {
-  const badge = BADGE[backend.state]
-  const label = backend.state === 'ready' ? backend.model : badge.label
-
-  return (
-    <div
-      className={`model-chip ${badge.tone}`}
-      title={backend.model ? `${badge.hint}: ${backend.model}` : badge.hint}
-    >
-      <span className="chip-indicator">
-        <span className="chip-ping" />
-        <span className="chip-core" />
-      </span>
-      <span className="chip-text">{label}</span>
-    </div>
-  )
-}
+const AVAILABLE_MODELS = [
+  { id: 'gemini-3.6-flash', name: 'Gemini 3.6 Flash', desc: 'Fast, high-capability, multimodal' },
+  { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', desc: 'Balanced speed and intelligence' },
+  { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash', desc: 'Lightweight and highly responsive' },
+  { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro', desc: 'Deep reasoning and complex tasks' },
+]
 
 export default function ChatWindow({
   conversation,
@@ -46,54 +27,113 @@ export default function ChatWindow({
   onRetry,
   onClear,
   onOpenSidebar,
+  selectedModel,
+  onSelectModel,
 }) {
+  const [modelDropdownOpen, setModelDropdownOpen] = useState(false)
   const endRef = useRef(null)
+  const dropdownRef = useRef(null)
   const { messages } = conversation
 
+  // Auto-scroll on new message
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
   }, [conversation.id, messages.length, loading])
 
+  // Close model dropdown when clicking outside
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setModelDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleOutsideClick)
+    return () => document.removeEventListener('mousedown', handleOutsideClick)
+  }, [])
+
+  const currentModelName =
+    AVAILABLE_MODELS.find((m) => m.id === (selectedModel || backend.model))?.name ||
+    backend.model ||
+    'Gemini 2.5 Flash'
+
   return (
-    <main className="main">
-      {/* Ambient background mesh lighting */}
-      <div className="ambient-glow-top" aria-hidden="true" />
-      <div className="ambient-glow-bottom" aria-hidden="true" />
-
-      {/* Glass Header */}
-      <header className="chat-header">
-        <div className="header-left">
-          <button className="icon-btn menu-btn" onClick={onOpenSidebar} aria-label="Open sidebar">
-            <Menu size={19} />
-          </button>
-          <div className="header-title-wrap">
-            <h2 className="chat-title">{conversation.title}</h2>
-          </div>
-        </div>
-
-        <div className="header-center">
-          <ModelBadge backend={backend} />
-        </div>
-
-        <div className="header-right">
+    <main className="main-chatgpt">
+      {/* Top Header */}
+      <header className="chatgpt-header">
+        <div className="header-left-bar">
           <button
-            className="icon-btn clear-btn"
-            onClick={onClear}
-            disabled={messages.length === 0 || loading}
-            aria-label="Clear conversation"
-            title="Clear conversation"
+            className="header-icon-btn menu-toggle-btn"
+            onClick={onOpenSidebar}
+            aria-label="Open sidebar"
+            title="Open sidebar"
           >
-            <Eraser size={17} />
+            <Menu size={20} />
           </button>
+          {messages.length > 0 && (
+            <h2 className="header-conversation-title">{conversation.title}</h2>
+          )}
+        </div>
+
+        <div className="header-right-bar" ref={dropdownRef}>
+          {/* Clear conversation button if chat has messages */}
+          {messages.length > 0 && (
+            <button
+              className="header-icon-btn clear-chat-btn"
+              onClick={onClear}
+              disabled={loading}
+              title="Clear conversation"
+              aria-label="Clear conversation"
+            >
+              <Eraser size={18} />
+            </button>
+          )}
+
+          {/* Model Selector Pill (Exact look from the screenshot: Gemini 2.5 Flash ⌵) */}
+          <div className="model-selector-wrapper">
+            <button
+              className="model-pill-selector"
+              onClick={() => setModelDropdownOpen((prev) => !prev)}
+              aria-label="Select AI model"
+              aria-expanded={modelDropdownOpen}
+            >
+              <span className="model-pill-name">{currentModelName}</span>
+              <ChevronDown size={15} className={`chevron-icon ${modelDropdownOpen ? 'open' : ''}`} />
+            </button>
+
+            {modelDropdownOpen && (
+              <div className="model-dropdown-menu">
+                <div className="dropdown-section-title">Model Selection</div>
+                {AVAILABLE_MODELS.map((m) => {
+                  const isSelected = (selectedModel || backend.model) === m.id
+                  return (
+                    <button
+                      key={m.id}
+                      className={`model-option-item ${isSelected ? 'selected' : ''}`}
+                      onClick={() => {
+                        onSelectModel(m.id)
+                        setModelDropdownOpen(false)
+                      }}
+                    >
+                      <div className="model-option-info">
+                        <div className="model-option-name">{m.name}</div>
+                        <div className="model-option-desc">{m.desc}</div>
+                      </div>
+                      {isSelected && <Check size={16} className="model-check-icon" />}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
-      {/* Chat scroll area */}
-      <div className="scroll">
+      {/* Messages Scroll Area */}
+      <div className="chatgpt-scroll-area">
         {messages.length === 0 ? (
           <WelcomeScreen onPick={onSend} disabled={loading} />
         ) : (
-          <div className="messages">
+          <div className="chatgpt-messages-container">
             {messages.map((message, index) => (
               <Message
                 key={message.id}
@@ -104,16 +144,14 @@ export default function ChatWindow({
             ))}
 
             {loading && (
-              <div className="msg assistant loading-state" role="status" aria-label="Ramagiri Tarun Siddhartha GPT is generating">
-                <div className="avatar-wrap">
-                  <Logo size={30} className="avatar-bot pulse" />
-                </div>
-                <div className="bubble assistant-bubble typing-bubble">
-                  <div className="typing-header">
-                    <Sparkles size={13} className="text-violet" />
-                    <span>Thinking with Gemini...</span>
+              <div className="msg-chatgpt assistant loading-row" role="status" aria-label="Tarun GPT is generating">
+                <div className="msg-avatar-col">
+                  <div className="swirl-avatar-wrap">
+                    <Logo size={22} className="avatar-swirl" />
                   </div>
-                  <div className="typing-dots">
+                </div>
+                <div className="msg-content-col">
+                  <div className="typing-dots-wave">
                     <span />
                     <span />
                     <span />
@@ -126,7 +164,7 @@ export default function ChatWindow({
         )}
       </div>
 
-      {/* Floating composer */}
+      {/* Floating Pill Composer */}
       <ChatInput onSend={onSend} disabled={loading} />
     </main>
   )

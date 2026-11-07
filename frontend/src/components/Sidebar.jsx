@@ -1,5 +1,15 @@
-import { useMemo, useState } from 'react'
-import { MessageSquare, Plus, Search, Sparkles, Trash2, X } from 'lucide-react'
+import { useState } from 'react'
+import {
+  HelpCircle,
+  Info,
+  Menu,
+  MessageSquare,
+  PanelLeftClose,
+  Settings,
+  SquarePen,
+  Trash2,
+  X,
+} from 'lucide-react'
 import Logo from './Logo'
 
 export default function Sidebar({
@@ -11,95 +21,58 @@ export default function Sidebar({
   onNew,
   onDelete,
   onClose,
+  onOpenModal,
 }) {
-  const [filterQuery, setFilterQuery] = useState('')
-
-  const filteredConversations = useMemo(() => {
-    if (!filterQuery.trim()) return conversations
-    const q = filterQuery.toLowerCase()
-    return conversations.filter((c) => c.title.toLowerCase().includes(q))
-  }, [conversations, filterQuery])
-
   return (
     <>
-      {open && <div className="overlay" onClick={onClose} />}
-      <aside className={`sidebar ${open ? 'open' : ''}`}>
-        {/* Brand Header */}
-        <div className="sidebar-head">
-          <div className="brand">
-            <Logo size={32} />
-            <div className="brand-text">
-              <span className="brand-name">TARUN SIDDHARTHA</span>
-              <span className="brand-badge">PRO</span>
-            </div>
+      {open && <div className="sidebar-overlay" onClick={onClose} />}
+      <aside className={`sidebar-chatgpt ${open ? 'open' : ''}`}>
+        {/* Top Header */}
+        <div className="sidebar-header">
+          <div className="brand-wrap">
+            <Logo size={24} className="brand-logo" />
+            <span className="brand-title">TARUN GPT</span>
           </div>
-          <button className="icon-btn sidebar-close" onClick={onClose} aria-label="Close sidebar">
-            <X size={18} />
+          <button
+            className="sidebar-toggle-btn"
+            onClick={onClose}
+            aria-label="Toggle sidebar"
+            title="Collapse sidebar"
+          >
+            <Menu size={18} />
           </button>
         </div>
 
         {/* New Chat Button */}
-        <button className="new-chat-btn" onClick={onNew}>
-          <div className="new-chat-icon">
-            <Plus size={16} strokeWidth={2.5} />
-          </div>
-          <span>Start New Chat</span>
-          <span className="new-chat-shortcut">⌘N</span>
+        <button className="new-chat-pill-btn" onClick={onNew}>
+          <SquarePen size={16} strokeWidth={2} />
+          <span>New Chat</span>
         </button>
 
-        {/* Search Conversations Input */}
-        {conversations.length > 2 && (
-          <div className="sidebar-search">
-            <Search size={14} className="search-icon" />
-            <input
-              type="text"
-              placeholder="Search chats..."
-              value={filterQuery}
-              onChange={(e) => setFilterQuery(e.target.value)}
-              aria-label="Search conversation history"
-            />
-            {filterQuery && (
-              <button
-                className="search-clear"
-                onClick={() => setFilterQuery('')}
-                aria-label="Clear search"
-              >
-                <X size={12} />
-              </button>
-            )}
-          </div>
-        )}
+        {/* Recent Chats Section */}
+        <div className="recent-section-label">Recent Chats</div>
 
-        {/* Conversation List */}
-        <div className="sidebar-section-title">
-          <span>Recent Conversations</span>
-          <span className="convo-count">{conversations.length}</span>
-        </div>
-
-        <nav className="convo-list" aria-label="Conversations">
-          {filteredConversations.length === 0 ? (
-            <div className="convo-empty">No conversations found</div>
+        <nav className="chats-scroll-list" aria-label="Recent Chats">
+          {conversations.length === 0 ? (
+            <div className="no-chats-hint">No recent chats</div>
           ) : (
-            filteredConversations.map((c) => {
+            conversations.map((c) => {
               const isActive = c.id === activeId
               const isLoading = loadingIds.has(c.id)
 
               return (
-                <div key={c.id} className={`convo ${isActive ? 'active' : ''}`}>
+                <div key={c.id} className={`chat-item-row ${isActive ? 'active' : ''}`}>
                   <button
-                    className="convo-title"
+                    className="chat-select-btn"
                     onClick={() => onSelect(c.id)}
                     title={c.title}
-                    aria-current={isActive ? 'true' : undefined}
                   >
-                    <MessageSquare size={15} className="convo-icon" />
-                    <span className="convo-text">{c.title}</span>
-                    {isLoading && (
-                      <span className="dot-pulse" role="status" aria-label="Generating response" />
-                    )}
+                    <MessageSquare size={16} className="chat-bubble-icon" />
+                    <span className="chat-title-text">{c.title}</span>
+                    {isLoading && <span className="generating-dot" />}
                   </button>
                   <button
-                    className="convo-del"
+                    className="chat-delete-btn"
                     onClick={(e) => {
                       e.stopPropagation()
                       onDelete(c.id)
@@ -115,13 +88,34 @@ export default function Sidebar({
           )}
         </nav>
 
-        {/* Footer info */}
-        <div className="sidebar-footer">
-          <div className="footer-status-pill">
-            <span className="status-dot-live" />
-            <span>Gemini Intelligence Active</span>
-          </div>
-          <p className="footer-copyright">Ramagiri Tarun Siddhartha · Neural Workspace</p>
+        {/* Bottom Options: Settings, Help, About */}
+        <div className="sidebar-bottom-actions">
+          <button
+            className="bottom-nav-btn"
+            onClick={() => onOpenModal('settings')}
+            aria-label="Settings"
+          >
+            <Settings size={17} />
+            <span>Settings</span>
+          </button>
+
+          <button
+            className="bottom-nav-btn"
+            onClick={() => onOpenModal('help')}
+            aria-label="Help"
+          >
+            <HelpCircle size={17} />
+            <span>Help</span>
+          </button>
+
+          <button
+            className="bottom-nav-btn"
+            onClick={() => onOpenModal('about')}
+            aria-label="About"
+          >
+            <Info size={17} />
+            <span>About</span>
+          </button>
         </div>
       </aside>
     </>
