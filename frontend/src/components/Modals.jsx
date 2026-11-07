@@ -137,3 +137,4 @@ export default function Modals({ modalType, onClose, onClearAllChats, backend })
     </div>
   )
 }
+
