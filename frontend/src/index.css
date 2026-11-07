@@ -1,0 +1,115 @@
+:root {
+  --bg: #07080e;
+  --bg-elevated: #0d0f19;
+  --surface: rgba(18, 22, 38, 0.65);
+  --surface-solid: #111425;
+  --surface-2: rgba(26, 31, 54, 0.75);
+  --surface-3: rgba(35, 43, 74, 0.85);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  --border-hover: rgba(255, 255, 255, 0.16);
+  --border-accent: rgba(139, 92, 246, 0.4);
+  --text: #f3f5fc;
+  --muted: #959bbd;
+  --dim: #62678c;
+  --violet: #8b5cf6;
+  --violet-glow: rgba(139, 92, 246, 0.25);
+  --purple: #a855f7;
+  --blue: #3b82f6;
+  --cyan: #38bdf8;
+  --grad: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
+  --grad-vibrant: linear-gradient(135deg, #a855f7 0%, #6366f1 50%, #38bdf8 100%);
+  --grad-surface: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+  --grad-bubble: linear-gradient(135deg, rgba(139, 92, 246, 0.28) 0%, rgba(59, 130, 246, 0.18) 100%);
+  --ok: #10b981;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+  --font: 'Plus Jakarta Sans', 'Manrope', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 30px rgba(139, 92, 246, 0.2);
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.65 var(--font);
+  letter-spacing: -0.011em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+:focus-visible {
+  outline: 2px solid var(--violet);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: rgba(139, 92, 246, 0.4);
+  color: #ffffff;
+}
+
+/* Custom minimal scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

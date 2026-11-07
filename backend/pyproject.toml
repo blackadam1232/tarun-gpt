@@ -1,0 +1,5 @@
+[tool.pyrefly]
+python_version = "3.14"
+search_path = [
+    "C:\\Users\\shiva\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\site-packages",
+]
