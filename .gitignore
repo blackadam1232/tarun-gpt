@@ -1,22 +1,12 @@
-# Dependencies
 node_modules/
 frontend/node_modules/
-
-# Production build outputs
 dist/
 frontend/dist/
-
-# Environment files
 .env
-.env.*
-!.env.example
-frontend/.env
-frontend/.env.*
-!frontend/.env.example
-
-# IDE & OS files
+backend/.env
+.venv/
+backend/.venv/
+__pycache__/
+*.pyc
 .DS_Store
-Thumbs.db
-.vscode/
-.idea/
 .vercel
