@@ -1,6 +1,14 @@
-import { AlertTriangle, Check, ExternalLink, HelpCircle, Info, Key, Settings, Trash2, X } from 'lucide-react'
+import { AlertTriangle, Check, ExternalLink, HelpCircle, Info, Key, Settings, Sparkles, Trash2, UserCheck, X } from 'lucide-react'
+import { PERSONAS } from '../constants/personas'
 
-export default function Modals({ modalType, onClose, onClearAllChats, backend }) {
+export default function Modals({
+  modalType,
+  onClose,
+  onClearAllChats,
+  backend,
+  selectedPersona,
+  onSelectPersona,
+}) {
   if (!modalType) return null
 
   return (
@@ -43,6 +51,33 @@ export default function Modals({ modalType, onClose, onClearAllChats, backend })
                 <span className={`model-status-pill ${backend.state === 'ready' ? 'ok' : 'warn'}`}>
                   {backend.state === 'ready' ? 'Connected' : backend.state}
                 </span>
+              </div>
+
+              {/* Persona Selection */}
+              <div className="setting-persona-section">
+                <div className="setting-info">
+                  <strong className="setting-label">AI Persona & Custom Instructions</strong>
+                  <span className="setting-subtext">Choose how Tarun GPT behaves and responds</span>
+                </div>
+                <div className="persona-chips-grid">
+                  {PERSONAS.map((p) => {
+                    const isSelected = (selectedPersona || 'default') === p.id
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        className={`persona-card-item ${isSelected ? 'active' : ''}`}
+                        onClick={() => onSelectPersona(p.id)}
+                      >
+                        <div className="persona-card-header">
+                          <span className="persona-name">{p.name}</span>
+                          {isSelected && <Check size={14} className="persona-check-icon" />}
+                        </div>
+                        <span className="persona-desc">{p.desc}</span>
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
 
               <div className="setting-option-row danger-zone">

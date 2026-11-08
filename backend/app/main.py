@@ -61,5 +61,9 @@ async def test_gemini() -> TestResponse:
 
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest) -> ChatResponse:
-    result = await gemini.generate(request.messages)
+    result = await gemini.generate(
+        request.messages,
+        model=request.model,
+        system_prompt=request.system_prompt,
+    )
     return ChatResponse(reply=result.text, model=result.model, elapsed_ms=result.elapsed_ms)

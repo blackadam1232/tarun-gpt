@@ -22,6 +22,8 @@ class ChatRequest(BaseModel):
     """The full conversation so far; the last message is the new user prompt."""
 
     messages: list[ChatMessage] = Field(min_length=1, max_length=100)
+    model: str | None = None
+    system_prompt: str | None = None
 
     @model_validator(mode="after")
     def last_message_is_user(self) -> "ChatRequest":

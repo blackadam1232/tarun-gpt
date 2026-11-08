@@ -3,8 +3,10 @@ import Sidebar from './components/Sidebar'
 import ChatWindow from './components/ChatWindow'
 import Modals from './components/Modals'
 import { getHealth, sendChat } from './services/api'
+import { DEFAULT_PERSONA_ID, getPersonaPrompt } from './constants/personas'
 
 const STORAGE_KEY = 'tarun-gpt:conversations:v1'
+const PERSONA_KEY = 'tarun-gpt:persona'
 
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8)
 const newConversation = () => ({ id: uid(), title: 'New chat', messages: [] })
@@ -32,6 +34,9 @@ export default function App() {
   const [loadingIds, setLoadingIds] = useState(() => new Set())
   const [backend, setBackend] = useState({ state: 'connecting', model: null })
   const [selectedModel, setSelectedModel] = useState(null)
+  const [selectedPersona, setSelectedPersona] = useState(() => {
+    return localStorage.getItem(PERSONA_KEY) || DEFAULT_PERSONA_ID
+  })
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [activeModal, setActiveModal] = useState(null)
 
@@ -63,6 +68,12 @@ export default function App() {
     }
   }, [])
 
+  // Save selected persona
+  const handleSelectPersona = (personaId) => {
+    setSelectedPersona(personaId)
+    localStorage.setItem(PERSONA_KEY, personaId)
+  }
+
   const patch = useCallback(
     (id, update) => setConversations((prev) => prev.map((c) => (c.id === id ? update(c) : c))),
     [],
@@ -72,7 +83,11 @@ export default function App() {
     async (convId, history) => {
       setLoadingIds((prev) => new Set(prev).add(convId))
       try {
-        const data = await sendChat(history.filter((m) => !m.error))
+        const systemPrompt = getPersonaPrompt(selectedPersona)
+        const data = await sendChat(history.filter((m) => !m.error), {
+          model: selectedModel,
+          systemPrompt,
+        })
         const reply = {
           id: uid(),
           role: 'assistant',
@@ -96,7 +111,7 @@ export default function App() {
         })
       }
     },
-    [patch],
+    [patch, selectedModel, selectedPersona],
   )
 
   const handleSend = (text) => {
@@ -132,6 +147,11 @@ export default function App() {
   const handleSelect = (id) => {
     setActiveId(id)
     setSidebarOpen(false)
+  }
+
+  const handleRename = (id, newTitle) => {
+    if (!newTitle?.trim()) return
+    patch(id, (c) => ({ ...c, title: newTitle.trim() }))
   }
 
   const handleDelete = (id) => {
@@ -170,6 +190,7 @@ export default function App() {
         open={sidebarOpen}
         onSelect={handleSelect}
         onNew={handleNew}
+        onRename={handleRename}
         onDelete={handleDelete}
         onClose={() => setSidebarOpen(false)}
         onOpenModal={(type) => setActiveModal(type)}
@@ -192,6 +213,8 @@ export default function App() {
         onClose={() => setActiveModal(null)}
         onClearAllChats={handleClearAllChats}
         backend={backend}
+        selectedPersona={selectedPersona}
+        onSelectPersona={handleSelectPersona}
       />
     </div>
   )

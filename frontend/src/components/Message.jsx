@@ -1,7 +1,7 @@
 import { Children, isValidElement, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { AlertCircle, Check, Clock, Copy, RotateCcw } from 'lucide-react'
+import { AlertCircle, Check, Clock, Copy, RotateCcw, Volume2, VolumeX } from 'lucide-react'
 import Logo from './Logo'
 
 async function copyText(text) {
@@ -22,6 +22,44 @@ async function copyText(text) {
       return false
     }
   }
+}
+
+function SpeakButton({ text }) {
+  const [speaking, setSpeaking] = useState(false)
+
+  const toggleSpeak = () => {
+    if (!('speechSynthesis' in window)) {
+      alert('Text-to-speech is not supported in this browser.')
+      return
+    }
+    if (speaking) {
+      window.speechSynthesis.cancel()
+      setSpeaking(false)
+    } else {
+      window.speechSynthesis.cancel()
+      const cleanText = text
+        .replace(/```[\s\S]*?```/g, 'Code block omitted for reading.')
+        .replace(/[#*_`>]/g, '')
+      const utterance = new SpeechSynthesisUtterance(cleanText)
+      utterance.rate = 1.05
+      utterance.onend = () => setSpeaking(false)
+      utterance.onerror = () => setSpeaking(false)
+      window.speechSynthesis.speak(utterance)
+      setSpeaking(true)
+    }
+  }
+
+  return (
+    <button
+      className={`chatgpt-copy-btn ${speaking ? 'speaking' : ''}`}
+      onClick={toggleSpeak}
+      title={speaking ? 'Stop speaking' : 'Read aloud'}
+      aria-label={speaking ? 'Stop speaking' : 'Read aloud'}
+    >
+      {speaking ? <VolumeX size={14} /> : <Volume2 size={14} />}
+      <span>{speaking ? 'Stop' : 'Read Aloud'}</span>
+    </button>
+  )
 }
 
 function CopyButton({ text, label = 'Copy code' }) {
@@ -123,6 +161,7 @@ export default function Message({ message, canRetry, onRetry }) {
 
         <div className="msg-bottom-actions">
           <CopyButton text={message.content} label="Copy response" />
+          <SpeakButton text={message.content} />
           {message.elapsedMs != null && (
             <span className="elapsed-time-tag">
               <Clock size={11} />

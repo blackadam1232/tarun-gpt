@@ -165,19 +165,25 @@ class GeminiService:
             )
         return self._client
 
-    async def generate(self, messages: list[ChatMessage]) -> Generation:
+    async def generate(
+        self,
+        messages: list[ChatMessage],
+        model: str | None = None,
+        system_prompt: str | None = None,
+    ) -> Generation:
         client = self._get_client()
-        model = self._settings.gemini_model
+        active_model = model or self._settings.gemini_model
+        instruction = system_prompt or SYSTEM_PROMPT
         started = time.perf_counter()
         try:
             response = await client.aio.models.generate_content(
-                model=model,
+                model=active_model,
                 contents=to_contents(messages),
-                config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT),
+                config=types.GenerateContentConfig(system_instruction=instruction),
             )
         except errors.APIError as exc:
             logger.warning("Gemini API error %s: %s", getattr(exc, "code", "?"), exc)
-            raise translate_api_error(exc, model) from exc
+            raise translate_api_error(exc, active_model) from exc
         except Exception as exc:
             kind = classify_transport_error(exc)
             if kind == "timeout":
@@ -196,7 +202,7 @@ class GeminiService:
 
         text = extract_text(response)
         elapsed_ms = round((time.perf_counter() - started) * 1000)
-        return Generation(text=text, model=model, elapsed_ms=elapsed_ms)
+        return Generation(text=text, model=active_model, elapsed_ms=elapsed_ms)
 
     async def self_test(self) -> Generation:
         prompt = [ChatMessage(role="user", content="Reply with exactly: Ramagiri Tarun Siddhartha GPT is online.")]

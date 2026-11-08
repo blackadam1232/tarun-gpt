@@ -43,8 +43,12 @@ async function request(path, options = {}) {
 export const getHealth = () => request('/api/health')
 
 /** Sends the whole conversation (the last message is the new prompt) and returns {reply, model, elapsed_ms}. */
-export const sendChat = (messages) =>
+export const sendChat = (messages, { model = null, systemPrompt = null } = {}) =>
   request('/api/chat', {
     method: 'POST',
-    body: JSON.stringify({ messages: messages.map(({ role, content }) => ({ role, content })) }),
+    body: JSON.stringify({
+      messages: messages.map(({ role, content }) => ({ role, content })),
+      model: model || undefined,
+      system_prompt: systemPrompt || undefined,
+    }),
   })

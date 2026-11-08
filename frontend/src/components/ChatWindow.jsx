@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import {
   Check,
   ChevronDown,
+  Download,
   Eraser,
   Menu,
   RotateCcw,
@@ -56,6 +57,25 @@ export default function ChatWindow({
     backend.model ||
     'Gemini 2.5 Flash'
 
+  const exportChat = () => {
+    if (!messages.length) return
+    const title = conversation.title || 'Tarun-GPT-Chat'
+    let md = `# ${title}\n*Exported from TARUN GPT on ${new Date().toLocaleString()}*\n\n---\n\n`
+    for (const msg of messages) {
+      const role = msg.role === 'user' ? '👤 **User**' : '✨ **Tarun GPT**'
+      md += `### ${role}\n\n${msg.content}\n\n---\n\n`
+    }
+    const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${title.toLowerCase().replace(/[^a-z0-9_-]+/gi, '_')}.md`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <main className="main-chatgpt">
       {/* Top Header */}
@@ -75,6 +95,18 @@ export default function ChatWindow({
         </div>
 
         <div className="header-right-bar" ref={dropdownRef}>
+          {/* Export conversation button if chat has messages */}
+          {messages.length > 0 && (
+            <button
+              className="header-icon-btn export-chat-btn"
+              onClick={exportChat}
+              title="Export chat as Markdown (.md)"
+              aria-label="Export chat as Markdown"
+            >
+              <Download size={17} />
+            </button>
+          )}
+
           {/* Clear conversation button if chat has messages */}
           {messages.length > 0 && (
             <button
