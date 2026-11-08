@@ -10,8 +10,9 @@ export class ApiError extends Error {
   }
 }
 
-const UNREACHABLE =
-  'Cannot reach the backend. Make sure it is running: uvicorn app.main:app --port 8000'
+const UNREACHABLE = BASE
+  ? `Cannot reach the backend at ${BASE}. The server might be waking up or blocking requests.`
+  : 'Cannot reach the backend. Make sure it is running: uvicorn app.main:app --port 8000'
 
 async function request(path, options = {}) {
   let response

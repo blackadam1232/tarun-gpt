@@ -28,11 +28,7 @@ class Settings:
 
 
 def load_settings() -> Settings:
-    origins = os.getenv("CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173")
-    vercel_url = os.getenv("VERCEL_URL")
-    if vercel_url and f"https://{vercel_url}" not in origins:
-        origins = f"{origins},https://{vercel_url}"
-    
+    origins = os.getenv("CORS_ORIGINS", "*")
     timeout_raw = os.getenv("REQUEST_TIMEOUT_SECONDS", "60")
     try:
         timeout_s = int(timeout_raw) if timeout_raw else 60

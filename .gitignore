@@ -4,6 +4,7 @@ dist/
 frontend/dist/
 .env
 backend/.env
+frontend/.env
 .venv/
 backend/.venv/
 __pycache__/
