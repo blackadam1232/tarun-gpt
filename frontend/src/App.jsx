@@ -57,11 +57,11 @@ export default function App() {
           if (!selectedModel) setSelectedModel(h.model)
         }
       })
-      .catch(() => !cancelled && setBackend({ state: 'offline', model: null }))
+      .catch(() => !cancelled && setBackend({ state: 'no-key', model: null }))
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [selectedModel])
 
   const patch = useCallback(
     (id, update) => setConversations((prev) => prev.map((c) => (c.id === id ? update(c) : c))),
@@ -72,7 +72,7 @@ export default function App() {
     async (convId, history) => {
       setLoadingIds((prev) => new Set(prev).add(convId))
       try {
-        const data = await sendChat(history.filter((m) => !m.error))
+        const data = await sendChat(history.filter((m) => !m.error), selectedModel)
         const reply = {
           id: uid(),
           role: 'assistant',
@@ -87,7 +87,6 @@ export default function App() {
           ...c,
           messages: [...c.messages, { id: uid(), role: 'assistant', content, error: true }],
         }))
-        if (err.status === 0) setBackend({ state: 'offline', model: null })
       } finally {
         setLoadingIds((prev) => {
           const next = new Set(prev)

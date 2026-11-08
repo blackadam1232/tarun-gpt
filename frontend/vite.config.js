@@ -1,12 +1,10 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// In development, /api requests are proxied to the FastAPI backend,
-// so the browser only ever talks to the Vite server (no CORS setup needed).
+// Static frontend application calling Google Gemini API directly from the browser
 export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
-    proxy: { '/api': 'http://127.0.0.1:8000' },
   },
 })
