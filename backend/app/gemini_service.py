@@ -204,6 +204,53 @@ class GeminiService:
         elapsed_ms = round((time.perf_counter() - started) * 1000)
         return Generation(text=text, model=active_model, elapsed_ms=elapsed_ms)
 
+    async def generate_stream(
+        self,
+        messages: list[ChatMessage],
+        model: str | None = None,
+        system_prompt: str | None = None,
+    ):
+        import json
+        client = self._get_client()
+        active_model = model or self._settings.gemini_model
+        instruction = system_prompt or SYSTEM_PROMPT
+        started = time.perf_counter()
+        try:
+            stream = await client.aio.models.generate_content_stream(
+                model=active_model,
+                contents=to_contents(messages),
+                config=types.GenerateContentConfig(system_instruction=instruction),
+            )
+            async for chunk in stream:
+                text = getattr(chunk, "text", "") or ""
+                if text:
+                    yield f"data: {json.dumps({'text': text})}\n\n"
+            elapsed_ms = round((time.perf_counter() - started) * 1000)
+            yield f"data: {json.dumps({'done': True, 'model': active_model, 'elapsed_ms': elapsed_ms})}\n\n"
+        except errors.APIError as exc:
+            err = translate_api_error(exc, active_model)
+            yield f"data: {json.dumps({'error': err.message})}\n\n"
+        except Exception as exc:
+            logger.warning("Streaming error: %r", exc)
+            yield f"data: {json.dumps({'error': 'Failed while streaming response. Please try again.'})}\n\n"
+
+    async def enhance_prompt(self, prompt: str) -> str:
+        client = self._get_client()
+        active_model = self._settings.gemini_model or "gemini-2.5-flash"
+        system_instruction = (
+            "You are a master AI Prompt Engineer. The user will give you a brief or rough prompt. "
+            "Your job is to rewrite and enhance it into a clear, detailed, highly effective, professional prompt "
+            "that gets the best possible answer from an advanced LLM. "
+            "Rules: Return ONLY the enhanced prompt. Do NOT add conversational replies, preambles, or markdown quotes."
+        )
+        response = await client.aio.models.generate_content(
+            model=active_model,
+            contents=prompt,
+            config=types.GenerateContentConfig(system_instruction=system_instruction),
+        )
+        text = extract_text(response)
+        return text.strip() if text else prompt
+
     async def self_test(self) -> Generation:
         prompt = [ChatMessage(role="user", content="Reply with exactly: Ramagiri Tarun Siddhartha GPT is online.")]
         return await self.generate(prompt)

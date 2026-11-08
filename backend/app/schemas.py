@@ -49,3 +49,11 @@ class TestResponse(BaseModel):
     model: str
     reply: str
     elapsed_ms: int
+
+
+class EnhancePromptRequest(BaseModel):
+    prompt: str = Field(min_length=1, max_length=4000)
+
+
+class EnhancePromptResponse(BaseModel):
+    enhanced: str

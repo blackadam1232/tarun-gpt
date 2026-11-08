@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Sidebar from './components/Sidebar'
 import ChatWindow from './components/ChatWindow'
 import Modals from './components/Modals'
-import { getHealth, sendChat } from './services/api'
+import { getHealth, streamChat } from './services/api'
 import { DEFAULT_PERSONA_ID, getPersonaPrompt } from './constants/personas'
 
 const STORAGE_KEY = 'tarun-gpt:conversations:v1'
@@ -39,6 +39,7 @@ export default function App() {
   })
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [activeModal, setActiveModal] = useState(null)
+  const abortControllerRef = useRef(null)
 
   const active = conversations.find((c) => c.id === activeId) ?? conversations[0]
   const loading = loadingIds.has(active.id)
@@ -79,31 +80,86 @@ export default function App() {
     [],
   )
 
+  const handleStop = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+      abortControllerRef.current = null
+    }
+    setLoadingIds((prev) => {
+      const next = new Set(prev)
+      next.delete(active.id)
+      return next
+    })
+    patch(active.id, (c) => ({
+      ...c,
+      messages: c.messages.map((m) => (m.isStreaming ? { ...m, isStreaming: false } : m)),
+    }))
+  }
+
   const generate = useCallback(
     async (convId, history) => {
       setLoadingIds((prev) => new Set(prev).add(convId))
+      const replyId = uid()
+      const controller = new AbortController()
+      abortControllerRef.current = controller
+
+      // Append assistant message that will stream live
+      patch(convId, (c) => ({
+        ...c,
+        messages: [
+          ...c.messages,
+          { id: replyId, role: 'assistant', content: '', isStreaming: true },
+        ],
+      }))
+
       try {
         const systemPrompt = getPersonaPrompt(selectedPersona)
-        const data = await sendChat(history.filter((m) => !m.error), {
+        await streamChat(history.filter((m) => !m.error), {
           model: selectedModel,
           systemPrompt,
+          signal: controller.signal,
+          onChunk: (chunkText) => {
+            patch(convId, (c) => ({
+              ...c,
+              messages: c.messages.map((m) =>
+                m.id === replyId ? { ...m, content: chunkText } : m,
+              ),
+            }))
+          },
+          onDone: (doneData) => {
+            patch(convId, (c) => ({
+              ...c,
+              messages: c.messages.map((m) =>
+                m.id === replyId
+                  ? { ...m, isStreaming: false, elapsedMs: doneData.elapsed_ms }
+                  : m,
+              ),
+            }))
+            setBackend({ state: 'ready', model: doneData.model })
+          },
         })
-        const reply = {
-          id: uid(),
-          role: 'assistant',
-          content: data.reply,
-          elapsedMs: data.elapsed_ms,
-        }
-        patch(convId, (c) => ({ ...c, messages: [...c.messages, reply] }))
-        setBackend({ state: 'ready', model: data.model })
+
+        // Ensure isStreaming is marked false
+        patch(convId, (c) => ({
+          ...c,
+          messages: c.messages.map((m) =>
+            m.id === replyId ? { ...m, isStreaming: false } : m,
+          ),
+        }))
       } catch (err) {
+        if (err.name === 'AbortError') return
         const content = err.message || 'Something went wrong. Please try again.'
         patch(convId, (c) => ({
           ...c,
-          messages: [...c.messages, { id: uid(), role: 'assistant', content, error: true }],
+          messages: c.messages.map((m) =>
+            m.id === replyId
+              ? { ...m, content: m.content || content, error: !m.content, isStreaming: false }
+              : m,
+          ),
         }))
         if (err.status === 0) setBackend({ state: 'offline', model: null })
       } finally {
+        abortControllerRef.current = null
         setLoadingIds((prev) => {
           const next = new Set(prev)
           next.delete(convId)
@@ -128,6 +184,14 @@ export default function App() {
   const handleRetry = () => {
     if (!active.messages.at(-1)?.error || loading) return
     const history = active.messages.slice(0, -1)
+    patch(active.id, (c) => ({ ...c, messages: history }))
+    generate(active.id, history)
+  }
+
+  const handleRegenerate = (msgIndex) => {
+    if (loading) return
+    // Slice history up to user question right before this assistant message
+    const history = active.messages.slice(0, msgIndex)
     patch(active.id, (c) => ({ ...c, messages: history }))
     generate(active.id, history)
   }
@@ -203,7 +267,9 @@ export default function App() {
         selectedModel={selectedModel}
         onSelectModel={(m) => setSelectedModel(m)}
         onSend={handleSend}
+        onStop={handleStop}
         onRetry={handleRetry}
+        onRegenerate={handleRegenerate}
         onClear={handleClear}
         onOpenSidebar={() => setSidebarOpen(true)}
       />

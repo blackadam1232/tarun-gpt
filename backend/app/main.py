@@ -4,11 +4,18 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 
 from .config import settings
 from .gemini_service import GeminiService, GeminiServiceError
-from .schemas import ChatRequest, ChatResponse, HealthResponse, TestResponse
+from .schemas import (
+    ChatRequest,
+    ChatResponse,
+    EnhancePromptRequest,
+    EnhancePromptResponse,
+    HealthResponse,
+    TestResponse,
+)
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
 
@@ -67,3 +74,28 @@ async def chat(request: ChatRequest) -> ChatResponse:
         system_prompt=request.system_prompt,
     )
     return ChatResponse(reply=result.text, model=result.model, elapsed_ms=result.elapsed_ms)
+
+
+@app.post("/api/chat/stream")
+async def chat_stream(request: ChatRequest) -> StreamingResponse:
+    """Streams Gemini response chunks live via Server-Sent Events (SSE)."""
+    return StreamingResponse(
+        gemini.generate_stream(
+            request.messages,
+            model=request.model,
+            system_prompt=request.system_prompt,
+        ),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
+
+
+@app.post("/api/enhance-prompt", response_model=EnhancePromptResponse)
+async def enhance_prompt(request: EnhancePromptRequest) -> EnhancePromptResponse:
+    """Expands and optimizes a user prompt into a high-yield, structured prompt."""
+    enhanced = await gemini.enhance_prompt(request.prompt)
+    return EnhancePromptResponse(enhanced=enhanced)

@@ -790,6 +790,36 @@
   cursor: not-allowed;
 }
 
+.stop-circle-btn {
+  background-color: #ffffff;
+  color: #0d0d0e;
+  transition: transform 0.1s ease;
+}
+
+.stop-circle-btn:hover {
+  background-color: #e4e4e7;
+  transform: scale(1.05);
+}
+
+.wand-btn {
+  color: #c084fc;
+}
+
+.wand-btn:hover {
+  background-color: rgba(192, 132, 252, 0.15);
+  color: #e9d5ff;
+}
+
+.wand-btn.enhancing {
+  color: #c084fc;
+  animation: pulseWand 1s infinite alternate;
+}
+
+@keyframes pulseWand {
+  0% { transform: rotate(0deg) scale(1); opacity: 0.6; }
+  100% { transform: rotate(15deg) scale(1.15); opacity: 1; }
+}
+
 /* Disclaimer Footer */
 .chatgpt-footer-disclaimer {
   margin: 8px 0 0;
@@ -974,12 +1004,56 @@
   border: none;
 }
 
+.streaming-cursor-block {
+  display: inline-block;
+  margin-left: 2px;
+  vertical-align: baseline;
+  color: #ffffff;
+  animation: blinkCursor 0.8s infinite;
+  font-weight: 900;
+}
+
+@keyframes blinkCursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
 /* Message Bottom Actions */
 .msg-bottom-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-top: 8px;
+}
+
+.msg-feedback-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.feedback-btn {
+  padding: 4px 6px;
+}
+
+.feedback-btn.active-up {
+  color: #10b981;
+  background-color: rgba(16, 185, 129, 0.15);
+}
+
+.feedback-btn.active-down {
+  color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.15);
+}
+
+.feedback-btn.regenerate-btn {
+  gap: 5px;
+}
+
+.feedback-btn.regenerate-btn:hover {
+  color: #60a5fa;
+  background-color: rgba(96, 165, 250, 0.15);
 }
 
 .chatgpt-copy-btn.speaking {

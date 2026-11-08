@@ -1,9 +1,25 @@
 import { useEffect, useRef, useState } from 'react'
-import { ArrowUp, Code2, FileCode, FileText, Mic, MicOff, Paperclip, Plus, Sparkles, Upload, X } from 'lucide-react'
+import {
+  ArrowUp,
+  Code2,
+  FileCode,
+  FileText,
+  Mic,
+  MicOff,
+  Paperclip,
+  Plus,
+  Sparkles,
+  Square,
+  Upload,
+  Wand2,
+  X,
+} from 'lucide-react'
+import { enhancePrompt } from '../services/api'
 
-export default function ChatInput({ onSend, disabled }) {
+export default function ChatInput({ onSend, disabled, loading, onStop }) {
   const [text, setText] = useState('')
   const [isListening, setIsListening] = useState(false)
+  const [isEnhancing, setIsEnhancing] = useState(false)
   const [showAttachMenu, setShowAttachMenu] = useState(false)
   const [attachedFile, setAttachedFile] = useState(null)
   const ref = useRef(null)
@@ -134,6 +150,22 @@ export default function ChatInput({ onSend, disabled }) {
     ref.current?.focus()
   }
 
+  const handleEnhance = async () => {
+    if (!text.trim() || isEnhancing) return
+    setIsEnhancing(true)
+    try {
+      const optimized = await enhancePrompt(text.trim())
+      if (optimized) {
+        setText(optimized)
+      }
+    } catch {
+      /* ignore */
+    } finally {
+      setIsEnhancing(false)
+      ref.current?.focus()
+    }
+  }
+
   const hasContent = text.trim() || attachedFile
 
   return (
@@ -225,6 +257,8 @@ export default function ChatInput({ onSend, disabled }) {
               placeholder={
                 isListening
                   ? 'Listening... Speak now.'
+                  : isEnhancing
+                  ? 'Optimizing your prompt with AI...'
                   : attachedFile
                   ? 'Ask anything about this file...'
                   : 'Ask anything...'
@@ -235,28 +269,56 @@ export default function ChatInput({ onSend, disabled }) {
 
           {/* Right Action Buttons */}
           <div className="pill-actions-right">
-            {/* Microphone Button */}
-            <button
-              type="button"
-              className={`input-circle-btn mic-btn ${isListening ? 'recording' : ''}`}
-              onClick={toggleMic}
-              aria-label={isListening ? 'Stop recording' : 'Voice input'}
-              title={isListening ? 'Listening...' : 'Voice input'}
-            >
-              {isListening ? <MicOff size={18} /> : <Mic size={18} />}
-            </button>
+            {/* Prompt Enhancer Wand (Shows when typing prompt) */}
+            {!loading && text.trim().length > 3 && (
+              <button
+                type="button"
+                className={`input-circle-btn wand-btn ${isEnhancing ? 'enhancing' : ''}`}
+                onClick={handleEnhance}
+                disabled={isEnhancing}
+                title={isEnhancing ? 'Optimizing prompt...' : 'Enhance prompt (Magic Wand)'}
+                aria-label="Enhance prompt"
+              >
+                <Wand2 size={16} />
+              </button>
+            )}
 
-            {/* Send Button */}
-            <button
-              type="button"
-              className="input-circle-btn send-circle-btn"
-              onClick={submit}
-              disabled={disabled || !hasContent}
-              aria-label="Send message"
-              title="Send message"
-            >
-              <ArrowUp size={18} strokeWidth={2.4} />
-            </button>
+            {/* Microphone Button */}
+            {!loading && (
+              <button
+                type="button"
+                className={`input-circle-btn mic-btn ${isListening ? 'recording' : ''}`}
+                onClick={toggleMic}
+                aria-label={isListening ? 'Stop recording' : 'Voice input'}
+                title={isListening ? 'Listening...' : 'Voice input'}
+              >
+                {isListening ? <MicOff size={18} /> : <Mic size={18} />}
+              </button>
+            )}
+
+            {/* Send OR Stop Button */}
+            {loading ? (
+              <button
+                type="button"
+                className="input-circle-btn stop-circle-btn"
+                onClick={onStop}
+                aria-label="Stop generating"
+                title="Stop generating"
+              >
+                <Square size={13} fill="currentColor" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="input-circle-btn send-circle-btn"
+                onClick={submit}
+                disabled={disabled || !hasContent}
+                aria-label="Send message"
+                title="Send message"
+              >
+                <ArrowUp size={18} strokeWidth={2.4} />
+              </button>
+            )}
           </div>
         </div>
 

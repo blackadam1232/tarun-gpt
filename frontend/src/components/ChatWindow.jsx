@@ -25,7 +25,9 @@ export default function ChatWindow({
   loading,
   backend,
   onSend,
+  onStop,
   onRetry,
+  onRegenerate,
   onClear,
   onOpenSidebar,
   selectedModel,
@@ -172,32 +174,16 @@ export default function ChatWindow({
                 message={message}
                 canRetry={Boolean(message.error) && index === messages.length - 1 && !loading}
                 onRetry={onRetry}
+                onRegenerate={() => onRegenerate(index)}
               />
             ))}
-
-            {loading && (
-              <div className="msg-chatgpt assistant loading-row" role="status" aria-label="Tarun GPT is generating">
-                <div className="msg-avatar-col">
-                  <div className="swirl-avatar-wrap">
-                    <Logo size={22} className="avatar-swirl" />
-                  </div>
-                </div>
-                <div className="msg-content-col">
-                  <div className="typing-dots-wave">
-                    <span />
-                    <span />
-                    <span />
-                  </div>
-                </div>
-              </div>
-            )}
             <div ref={endRef} />
           </div>
         )}
       </div>
 
       {/* Floating Pill Composer */}
-      <ChatInput onSend={onSend} disabled={loading} />
+      <ChatInput onSend={onSend} disabled={loading} loading={loading} onStop={onStop} />
     </main>
   )
 }

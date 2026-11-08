@@ -1,7 +1,17 @@
 import { Children, isValidElement, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { AlertCircle, Check, Clock, Copy, RotateCcw, Volume2, VolumeX } from 'lucide-react'
+import {
+  AlertCircle,
+  Check,
+  Clock,
+  Copy,
+  RotateCcw,
+  ThumbsDown,
+  ThumbsUp,
+  Volume2,
+  VolumeX,
+} from 'lucide-react'
 import Logo from './Logo'
 
 async function copyText(text) {
@@ -110,7 +120,43 @@ const markdownComponents = {
   ),
 }
 
-export default function Message({ message, canRetry, onRetry }) {
+function FeedbackButtons({ onRegenerate }) {
+  const [rating, setRating] = useState(null) // 'up' | 'down' | null
+
+  return (
+    <div className="msg-feedback-group">
+      <button
+        className={`chatgpt-copy-btn feedback-btn ${rating === 'up' ? 'active-up' : ''}`}
+        onClick={() => setRating((prev) => (prev === 'up' ? null : 'up'))}
+        title="Good response"
+        aria-label="Good response"
+      >
+        <ThumbsUp size={13} />
+      </button>
+      <button
+        className={`chatgpt-copy-btn feedback-btn ${rating === 'down' ? 'active-down' : ''}`}
+        onClick={() => setRating((prev) => (prev === 'down' ? null : 'down'))}
+        title="Bad response"
+        aria-label="Bad response"
+      >
+        <ThumbsDown size={13} />
+      </button>
+      {onRegenerate && (
+        <button
+          className="chatgpt-copy-btn feedback-btn regenerate-btn"
+          onClick={onRegenerate}
+          title="Regenerate response"
+          aria-label="Regenerate response"
+        >
+          <RotateCcw size={13} />
+          <span>Regenerate</span>
+        </button>
+      )}
+    </div>
+  )
+}
+
+export default function Message({ message, canRetry, onRetry, onRegenerate }) {
   if (message.role === 'user') {
     return (
       <div className="msg-chatgpt user">
@@ -144,8 +190,10 @@ export default function Message({ message, canRetry, onRetry }) {
     )
   }
 
+  const isStreaming = Boolean(message.isStreaming)
+
   return (
-    <div className="msg-chatgpt assistant">
+    <div className={`msg-chatgpt assistant ${isStreaming ? 'streaming' : ''}`}>
       <div className="msg-avatar-col">
         <div className="swirl-avatar-wrap">
           <Logo size={22} className="avatar-swirl" />
@@ -153,22 +201,36 @@ export default function Message({ message, canRetry, onRetry }) {
       </div>
 
       <div className="msg-content-col">
-        <div className="chatgpt-markdown-body">
-          <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-            {message.content}
-          </ReactMarkdown>
-        </div>
+        {/* If streaming started but no text received yet, show bounce wave */}
+        {isStreaming && !message.content ? (
+          <div className="typing-dots-wave">
+            <span />
+            <span />
+            <span />
+          </div>
+        ) : (
+          <div className="chatgpt-markdown-body">
+            <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+              {message.content}
+            </ReactMarkdown>
+            {isStreaming && <span className="streaming-cursor-block">▋</span>}
+          </div>
+        )}
 
-        <div className="msg-bottom-actions">
-          <CopyButton text={message.content} label="Copy response" />
-          <SpeakButton text={message.content} />
-          {message.elapsedMs != null && (
-            <span className="elapsed-time-tag">
-              <Clock size={11} />
-              {(message.elapsedMs / 1000).toFixed(1)}s
-            </span>
-          )}
-        </div>
+        {/* Action toolbar shows once generation is finished */}
+        {!isStreaming && message.content && (
+          <div className="msg-bottom-actions">
+            <CopyButton text={message.content} label="Copy response" />
+            <SpeakButton text={message.content} />
+            <FeedbackButtons onRegenerate={onRegenerate} />
+            {message.elapsedMs != null && (
+              <span className="elapsed-time-tag">
+                <Clock size={11} />
+                {(message.elapsedMs / 1000).toFixed(1)}s
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )
