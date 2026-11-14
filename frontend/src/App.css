@@ -1462,14 +1462,37 @@
 }
 
 /* ==========================================================================
-   MOBILE RESPONSIVENESS
+   RESPONSIVE DESIGN — COMPREHENSIVE DEVICE SUPPORT
    ========================================================================== */
+
+/* ---------- Tablets landscape & small desktops (≤ 1024px) ---------- */
+@media (max-width: 1024px) {
+  .welcome-chatgpt {
+    max-width: 600px;
+  }
+
+  .chatgpt-messages-container {
+    max-width: 640px;
+  }
+
+  .composer-container {
+    max-width: 620px;
+  }
+
+  .suggestions-grid {
+    gap: 10px;
+  }
+}
+
+/* ---------- Tablets portrait (≤ 768px) ---------- */
 @media (max-width: 768px) {
+  /* Sidebar becomes a slide-in drawer */
   .sidebar-chatgpt {
     position: fixed;
     inset: 0 auto 0 0;
     width: min(280px, 80vw);
     transform: translateX(-100%);
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
   }
 
   .sidebar-chatgpt.open {
@@ -1483,31 +1506,753 @@
     z-index: 15;
   }
 
+  /* Show hamburger menu button */
   .menu-toggle-btn {
     display: grid;
   }
 
+  /* Welcome screen */
   .suggestions-grid {
     grid-template-columns: 1fr;
+    gap: 8px;
   }
 
   .welcome-chatgpt {
     padding: 4vh 16px 20px;
+    max-width: 100%;
   }
 
   .hero-title {
     font-size: 26px;
   }
 
+  .hero-subtitle {
+    font-size: 14px;
+  }
+
+  .suggestion-pill-card {
+    padding: 12px 14px;
+  }
+
+  .suggestion-label {
+    font-size: 13px;
+  }
+
+  /* Messages */
   .chatgpt-messages-container {
     padding: 16px 12px 8px;
+    max-width: 100%;
   }
 
   .user-bubble-box {
     max-width: 90%;
+    font-size: 14px;
+    padding: 9px 14px;
   }
 
+  .chatgpt-markdown-body {
+    font-size: 14px;
+  }
+
+  /* Input composer */
   .chatgpt-composer-dock {
     padding: 8px 12px 12px;
   }
+
+  .composer-container {
+    max-width: 100%;
+  }
+
+  /* Header */
+  .chatgpt-header {
+    padding: 8px 12px;
+    height: 48px;
+  }
+
+  .header-conversation-title {
+    font-size: 13.5px;
+    max-width: 140px;
+  }
+
+  /* Model selector */
+  .model-pill-selector {
+    padding: 5px 10px;
+    font-size: 12px;
+    gap: 5px;
+  }
+
+  .model-dropdown-menu {
+    width: 220px;
+    right: -10px;
+  }
+
+  /* Code blocks */
+  .chatgpt-code-block pre {
+    font-size: 12.5px;
+    padding: 10px;
+  }
+
+  /* Modals */
+  .modal-dialog-card {
+    max-width: 95vw;
+    max-height: 90vh;
+    border-radius: 14px;
+  }
+
+  .modal-backdrop-overlay {
+    padding: 10px;
+  }
+
+  .modal-dialog-body {
+    padding: 16px;
+  }
+
+  /* Footer */
+  .chatgpt-footer-disclaimer {
+    font-size: 10.5px;
+  }
+
+  /* Message actions */
+  .msg-bottom-actions {
+    gap: 4px;
+  }
+
+  .elapsed-time-tag {
+    font-size: 10px;
+  }
+
+  /* About modal */
+  .about-item {
+    font-size: 11.5px;
+  }
+
+  /* Attach popup */
+  .attach-popup-menu {
+    width: 200px;
+  }
+
+  /* File badge */
+  .attached-file-name {
+    max-width: 120px;
+  }
+}
+
+/* ---------- Large phones (≤ 640px) ---------- */
+@media (max-width: 640px) {
+  .hero-title {
+    font-size: 22px;
+  }
+
+  .hero-subtitle {
+    font-size: 13px;
+  }
+
+  .welcome-chatgpt {
+    padding: 3vh 12px 16px;
+  }
+
+  .welcome-hero {
+    margin-bottom: 24px;
+  }
+
+  .hero-swirl {
+    margin-bottom: 14px;
+  }
+
+  /* Header */
+  .chatgpt-header {
+    padding: 6px 10px;
+    height: 44px;
+    gap: 6px;
+  }
+
+  .header-left-bar {
+    gap: 6px;
+  }
+
+  .header-right-bar {
+    gap: 6px;
+  }
+
+  .header-icon-btn {
+    padding: 5px;
+  }
+
+  .header-conversation-title {
+    font-size: 13px;
+    max-width: 100px;
+  }
+
+  /* Messages */
+  .chatgpt-messages-container {
+    padding: 12px 10px 8px;
+    gap: 14px;
+  }
+
+  .msg-chatgpt {
+    gap: 10px;
+  }
+
+  .user-bubble-box {
+    max-width: 92%;
+    padding: 8px 12px;
+    font-size: 13.5px;
+    border-radius: 16px;
+  }
+
+  .chatgpt-markdown-body {
+    font-size: 13.5px;
+    line-height: 1.6;
+  }
+
+  .chatgpt-markdown-body h1 { font-size: 18px; }
+  .chatgpt-markdown-body h2 { font-size: 16px; }
+  .chatgpt-markdown-body h3 { font-size: 14.5px; }
+
+  .swirl-avatar-wrap {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* Input pill */
+  .chatgpt-input-pill {
+    padding: 6px 8px 6px 10px;
+    gap: 6px;
+  }
+
+  .chatgpt-input-pill textarea {
+    font-size: 14px;
+    padding: 4px 0;
+  }
+
+  .input-circle-btn {
+    width: 30px;
+    height: 30px;
+  }
+
+  .pill-actions-right {
+    gap: 4px;
+  }
+
+  /* Model dropdown */
+  .model-dropdown-menu {
+    position: fixed;
+    top: auto;
+    bottom: 70px;
+    left: 10px;
+    right: 10px;
+    width: auto;
+    border-radius: 14px;
+  }
+
+  /* Code blocks */
+  .chatgpt-code-block pre {
+    font-size: 12px;
+    padding: 8px;
+    line-height: 1.5;
+  }
+
+  .code-block-header {
+    padding: 5px 10px;
+  }
+
+  .code-language-tag {
+    font-size: 10.5px;
+  }
+
+  /* Suggestion cards */
+  .suggestion-pill-card {
+    padding: 10px 12px;
+    gap: 10px;
+    border-radius: 12px;
+  }
+
+  .suggestion-label {
+    font-size: 12.5px;
+  }
+
+  /* Message actions become more touch-friendly */
+  .chatgpt-copy-btn,
+  .feedback-btn {
+    padding: 6px 8px;
+    min-height: 32px;
+  }
+
+  /* Modals */
+  .modal-dialog-header {
+    padding: 12px 16px;
+  }
+
+  .modal-title-wrap h3 {
+    font-size: 15px;
+  }
+
+  .modal-dialog-body {
+    padding: 14px;
+  }
+
+  .persona-card-item {
+    padding: 8px 12px;
+  }
+
+  .persona-name {
+    font-size: 13px;
+  }
+
+  .persona-desc {
+    font-size: 11px;
+  }
+
+  /* Sidebar adjustments for phones */
+  .sidebar-chatgpt {
+    width: min(260px, 82vw);
+  }
+
+  .brand-title {
+    font-size: 14px;
+  }
+
+  .new-chat-pill-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .chat-select-btn {
+    padding: 8px 8px;
+    font-size: 13px;
+  }
+
+  .bottom-nav-btn {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  /* Attach popup on phones */
+  .attach-popup-menu {
+    width: calc(100vw - 24px);
+    left: -4px;
+  }
+
+  /* Touch-friendly chat item actions - always visible on mobile */
+  .chat-item-actions {
+    opacity: 1;
+  }
+}
+
+/* ---------- Small phones (≤ 480px) ---------- */
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 20px;
+  }
+
+  .hero-subtitle {
+    font-size: 12.5px;
+    line-height: 1.4;
+  }
+
+  .welcome-chatgpt {
+    padding: 2vh 10px 14px;
+  }
+
+  .welcome-hero {
+    margin-bottom: 18px;
+  }
+
+  /* Header ultra-compact */
+  .chatgpt-header {
+    padding: 4px 8px;
+    height: 42px;
+  }
+
+  .header-conversation-title {
+    font-size: 12.5px;
+    max-width: 80px;
+  }
+
+  .model-pill-selector {
+    padding: 4px 8px;
+    font-size: 11px;
+    gap: 4px;
+  }
+
+  /* Messages ultra-compact */
+  .chatgpt-messages-container {
+    padding: 10px 8px 6px;
+    gap: 12px;
+  }
+
+  .user-bubble-box {
+    max-width: 95%;
+    font-size: 13px;
+    padding: 7px 10px;
+    border-radius: 14px;
+  }
+
+  .chatgpt-markdown-body {
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .chatgpt-markdown-body ul,
+  .chatgpt-markdown-body ol {
+    padding-left: 16px;
+  }
+
+  .chatgpt-markdown-body code {
+    font-size: 0.85em;
+    padding: 1px 4px;
+  }
+
+  .swirl-avatar-wrap {
+    width: 26px;
+    height: 26px;
+  }
+
+  /* Input even more compact */
+  .chatgpt-composer-dock {
+    padding: 6px 8px 8px;
+  }
+
+  .chatgpt-input-pill {
+    padding: 5px 6px 5px 8px;
+    gap: 4px;
+    border-radius: 22px;
+  }
+
+  .chatgpt-input-pill textarea {
+    font-size: 13.5px;
+  }
+
+  .input-circle-btn {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* Code blocks tiny screens */
+  .chatgpt-code-block pre {
+    font-size: 11px;
+    padding: 6px;
+  }
+
+  .chatgpt-code-block {
+    border-radius: 8px;
+    margin: 8px 0;
+  }
+
+  .code-block-header {
+    padding: 4px 8px;
+  }
+
+  .code-language-tag {
+    font-size: 10px;
+  }
+
+  .chatgpt-copy-btn {
+    font-size: 11px;
+    padding: 3px 6px;
+  }
+
+  /* Suggestion cards */
+  .suggestion-pill-card {
+    padding: 9px 10px;
+    gap: 8px;
+    border-radius: 10px;
+  }
+
+  .suggestion-label {
+    font-size: 12px;
+  }
+
+  .suggestion-icon-wrap {
+    display: none;
+  }
+
+  /* Footer */
+  .chatgpt-footer-disclaimer {
+    font-size: 10px;
+    margin: 4px 0 0;
+  }
+
+  /* Modals full-width on tiny phones */
+  .modal-backdrop-overlay {
+    padding: 6px;
+  }
+
+  .modal-dialog-card {
+    max-width: 100vw;
+    border-radius: 12px;
+  }
+
+  .modal-dialog-header {
+    padding: 10px 14px;
+  }
+
+  .modal-dialog-body {
+    padding: 12px;
+  }
+
+  .modal-title-wrap h3 {
+    font-size: 14.5px;
+  }
+
+  .setting-option-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .setting-label {
+    font-size: 13px;
+  }
+
+  .setting-subtext {
+    font-size: 11px;
+  }
+
+  /* Error card */
+  .error-alert-card {
+    padding: 10px 12px;
+  }
+
+  .error-text-line {
+    font-size: 12.5px;
+  }
+
+  /* Help shortcuts */
+  .shortcut-row {
+    font-size: 12px;
+  }
+
+  .shortcut-row kbd {
+    font-size: 10px;
+    padding: 1px 5px;
+  }
+
+  /* Typing dots */
+  .typing-dots-wave span {
+    width: 6px;
+    height: 6px;
+  }
+
+  /* About modal */
+  .about-brand {
+    font-size: 17px;
+  }
+
+  .about-tagline {
+    font-size: 12px;
+  }
+
+  .about-item {
+    font-size: 11px;
+  }
+
+  /* File badge */
+  .attached-file-name {
+    max-width: 90px;
+  }
+
+  .attached-file-badge {
+    font-size: 11px;
+    padding: 2px 6px;
+  }
+
+  .attached-file-size {
+    font-size: 10px;
+  }
+
+  /* Sidebar phones */
+  .sidebar-chatgpt {
+    width: min(240px, 85vw);
+  }
+
+  .sidebar-header {
+    padding: 4px 4px 10px;
+  }
+
+  .brand-title {
+    font-size: 13px;
+  }
+
+  .new-chat-pill-btn {
+    padding: 8px 10px;
+    font-size: 12.5px;
+    margin: 2px 0 10px;
+  }
+
+  .sidebar-search-box {
+    padding: 6px 8px;
+  }
+
+  .sidebar-search-box input {
+    font-size: 12px;
+  }
+
+  .recent-section-label {
+    font-size: 10.5px;
+    padding: 6px 6px 4px;
+  }
+
+  .chat-select-btn {
+    font-size: 12.5px;
+    padding: 7px 6px;
+    gap: 8px;
+  }
+
+  .bottom-nav-btn {
+    padding: 7px 8px;
+    font-size: 12.5px;
+    gap: 10px;
+  }
+
+  /* Danger zone */
+  .danger-action-btn {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+}
+
+/* ---------- Tiny phones (≤ 360px) ---------- */
+@media (max-width: 360px) {
+  .hero-title {
+    font-size: 18px;
+  }
+
+  .chatgpt-header {
+    padding: 4px 6px;
+  }
+
+  .model-pill-selector {
+    padding: 3px 6px;
+    font-size: 10.5px;
+  }
+
+  .header-conversation-title {
+    max-width: 60px;
+    font-size: 12px;
+  }
+
+  .header-icon-btn {
+    padding: 4px;
+  }
+
+  .chatgpt-input-pill textarea {
+    font-size: 13px;
+  }
+
+  .input-circle-btn {
+    width: 26px;
+    height: 26px;
+  }
+
+  .user-bubble-box {
+    font-size: 12.5px;
+  }
+
+  .chatgpt-markdown-body {
+    font-size: 12.5px;
+  }
+
+  .sidebar-chatgpt {
+    width: min(220px, 88vw);
+  }
+}
+
+/* ---------- Landscape phone override ---------- */
+@media (max-height: 500px) and (orientation: landscape) {
+  .welcome-chatgpt {
+    padding: 2vh 16px 10px;
+  }
+
+  .welcome-hero {
+    margin-bottom: 12px;
+  }
+
+  .hero-title {
+    font-size: 20px;
+  }
+
+  .suggestions-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  .suggestion-pill-card {
+    padding: 8px 10px;
+  }
+
+  .modal-dialog-card {
+    max-height: 95vh;
+  }
+
+  .chatgpt-header {
+    height: 40px;
+  }
+}
+
+/* ---------- Touch-friendly tap targets ---------- */
+@media (hover: none) and (pointer: coarse) {
+  .chat-item-actions {
+    opacity: 1;
+  }
+
+  .chat-action-icon-btn {
+    padding: 8px;
+    min-width: 36px;
+    min-height: 36px;
+  }
+
+  .header-icon-btn {
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  .input-circle-btn {
+    min-width: 36px;
+    min-height: 36px;
+  }
+
+  .chatgpt-copy-btn,
+  .feedback-btn {
+    min-height: 36px;
+    min-width: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .bottom-nav-btn {
+    min-height: 44px;
+  }
+
+  .modal-close-icon-btn {
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  .danger-action-btn {
+    min-height: 40px;
+  }
+
+  .chatgpt-retry-btn {
+    min-height: 40px;
+  }
+}
+
+/* ---------- Overflow protection for all screens ---------- */
+.chatgpt-markdown-body pre {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.chatgpt-markdown-body table {
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+}
+
+.chatgpt-markdown-body img {
+  max-width: 100%;
+  height: auto;
 }
